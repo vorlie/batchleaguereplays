@@ -48,29 +48,6 @@ def load_champion_data():
     except Exception as e:
         logging.error(f"Failed loading Data Dragon champion database context: {e}")
 
-def update_patch_display(self):
-        token, port = self.get_client_credentials()
-        if not token or not port:
-            self.patch_label.setText("Client Patch: LCU Offline")
-            return
-
-        url = f"https://127.0.0.1:{port}/lol-patch/v1/game-version"
-        try:
-            response = requests.get(url, auth=("riot", token), verify=False)
-            if response.status_code == 200:
-                # The client returns a full version string like "16.12.654.321"
-                # We split it to show just the major/minor patch version (e.g., "16.12")
-                full_version = response.json()
-                version_parts = full_version.split('.')
-                short_version = ".".join(version_parts[:2]) if len(version_parts) >= 2 else full_version
-                
-                self.patch_label.setText(f"Client Patch: Live on Patch {short_version}")
-                logging.info(f"Detected LCU game version: {full_version}")
-            else:
-                self.patch_label.setText("Client Patch: Status Check Failed")
-        except Exception as e:
-            self.patch_label.setText("Client Patch: Check Error")
-
 class MatchHistoryViewer(QWidget):
     """A standalone window that displays a specific JSON batch of matches."""
     def __init__(self, title, games_list, download_callback):
@@ -183,6 +160,29 @@ class ReplayDownloaderApp(QWidget):
         main_layout.addWidget(self.log_output)
         
         self.setLayout(main_layout)
+
+    def update_patch_display(self):
+        token, port = self.get_client_credentials()
+        if not token or not port:
+            self.patch_label.setText("Client Patch: LCU Offline")
+            return
+
+        url = f"https://127.0.0.1:{port}/lol-patch/v1/game-version"
+        try:
+            response = requests.get(url, auth=("riot", token), verify=False)
+            if response.status_code == 200:
+                # The client returns a full version string like "16.12.654.321"
+                # We split it to show just the major/minor patch version (e.g., "16.12")
+                full_version = response.json()
+                version_parts = full_version.split('.')
+                short_version = ".".join(version_parts[:2]) if len(version_parts) >= 2 else full_version
+                
+                self.patch_label.setText(f"Client Patch: Live on Patch {short_version}")
+                logging.info(f"Detected LCU game version: {full_version}")
+            else:
+                self.patch_label.setText("Client Patch: Status Check Failed")
+        except Exception as e:
+            self.patch_label.setText("Client Patch: Check Error")
 
     def log_message(self, message, level="info"):
         if level == "error":
