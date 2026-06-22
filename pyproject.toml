@@ -1,6 +1,6 @@
 [project]
 name = "batchleaguereplays"
-version = "0.4.0"
+version = "0.5.0"
 description = "A PyQt6 app to grab old League replays via LCU API"
 readme = "README.md"
 requires-python = ">=3.11"

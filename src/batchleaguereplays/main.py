@@ -48,6 +48,29 @@ def load_champion_data():
     except Exception as e:
         logging.error(f"Failed loading Data Dragon champion database context: {e}")
 
+def update_patch_display(self):
+        token, port = self.get_client_credentials()
+        if not token or not port:
+            self.patch_label.setText("Client Patch: LCU Offline")
+            return
+
+        url = f"https://127.0.0.1:{port}/lol-patch/v1/game-version"
+        try:
+            response = requests.get(url, auth=("riot", token), verify=False)
+            if response.status_code == 200:
+                # The client returns a full version string like "16.12.654.321"
+                # We split it to show just the major/minor patch version (e.g., "16.12")
+                full_version = response.json()
+                version_parts = full_version.split('.')
+                short_version = ".".join(version_parts[:2]) if len(version_parts) >= 2 else full_version
+                
+                self.patch_label.setText(f"Client Patch: Live on Patch {short_version}")
+                logging.info(f"Detected LCU game version: {full_version}")
+            else:
+                self.patch_label.setText("Client Patch: Status Check Failed")
+        except Exception as e:
+            self.patch_label.setText("Client Patch: Check Error")
+
 class MatchHistoryViewer(QWidget):
     """A standalone window that displays a specific JSON batch of matches."""
     def __init__(self, title, games_list, download_callback):
@@ -114,6 +137,7 @@ class ReplayDownloaderApp(QWidget):
         super().__init__()
         self.spawned_windows = []  # Keeps secondary UI object references alive in RAM
         self.init_ui()
+        self.update_patch_display()
         
     def init_ui(self):
         self.setWindowTitle("League Replay Grabber Pro")
@@ -140,7 +164,21 @@ class ReplayDownloaderApp(QWidget):
         self.log_output.setReadOnly(True)
         self.log_output.append("System ready.")
         
+        # Add the horizontal input row first
         main_layout.addLayout(input_layout)
+        
+        # --- NEW: Patch Display & Version Disclaimer ---
+        self.patch_label = QLabel("Client Patch: Fetching...")
+        self.patch_label.setStyleSheet("font-weight: bold; color: #a0a0a0;")
+        main_layout.addWidget(self.patch_label)
+
+        self.version_warning = QLabel("⚠️ Note: Replay downloads will only work for matches played on the CURRENT patch version.")
+        self.version_warning.setStyleSheet("color: #ffb703; font-style: italic;")
+        self.version_warning.setWordWrap(True)
+        main_layout.addWidget(self.version_warning)
+        # -----------------------------------------------
+        
+        # Add the remaining interactive items
         main_layout.addWidget(self.browse_btn)
         main_layout.addWidget(self.log_output)
         

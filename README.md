@@ -52,6 +52,7 @@ To install the compiled `.whl` bundle directly as a standalone system program:
 ---
 
 ## 🕹️ How to Use
+⚠️ **Important Patch Notice:** Due to how League of Legends handles game assets, replays are strictly locked to the patch they were played on. The app displays your current client patch version on startup. Attempting to download or launch a replay from an older patch will fail.
 
 1. Launch your **League of Legends Client** and log into your account.
 2. Double-click your new **BatchLeagueReplays** Desktop shortcut.
