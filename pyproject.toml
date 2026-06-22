@@ -1,0 +1,22 @@
+[project]
+name = "batchleaguereplays"
+version = "0.4.0"
+description = "A PyQt6 app to grab old League replays via LCU API"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "pyqt6>=6.11.0",
+    "requests>=2.34.2",
+    "urllib3>=2.7.0",
+]
+
+# This binds the terminal command 'batchleaguereplays' to Python function
+[project.scripts]
+batchleaguereplays = "batchleaguereplays.main:run_app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+managed = true
